@@ -1,5 +1,8 @@
 from selenium import webdriver as WD
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
 import selenium.webdriver.common.devtools.v107 as Devtools
 #import time
@@ -12,33 +15,27 @@ class APIEndpointFinder:
         chrome_options.add_argument("user-data-dir=C:/Users/mihir/AppData/Local/Google/Chrome/User Data")
         chrome_options.add_argument("remote-debugging-port=9222")   
         self.WebDriver = WD.Chrome(options = chrome_options)
-        self.__endpoint_URL_list__ = []
-
+        self.wait = WebDriverWait(self.WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]) #Defines wait conditions for Webdriver to click particular buttons
+        
         self.WebDriver.maximize_window()
         Devtools.network.enable()
 
     def get_URL_list(self, panopto_video_URL): 
-        self.endpoint_URL_list = []
+        endpoint_URL_list = []
         
-        #Devtools.network
         self.WebDriver.get(panopto_video_URL)
-        self.__login_to_kerberos__()
 
-        while True: #Waits until controls of video player are accessible to Selenium. #TODO Prevent potential infinite loop
-            try: 
-                self.__play_video__() 
-                self.__mute_video__()
-            except:
-                continue
-            else:
-                break
-                
+        self.__login_to_kerberos__()
+        self.__play_video__() 
+        self.__mute_video__()
+   
         if self.WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
             self.__click_through_camera_expander__()
         else: #Video player does not have camera expander
             self.__click_through_all_cameras__()
+        
         #TODO Check if num_cameras equals number of clicks, throw exception otherwise
-        return self.__endpoint_URL_list__
+        return endpoint_URL_list
 
     def __login_to_kerberos__(self):
         try: 
@@ -48,17 +45,18 @@ class APIEndpointFinder:
             return 
 
     def __mute_video__(self):
-        volumeControl_elem = self.WebDriver.find_element(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
-        if volumeControl_elem.get_attribute("title") == "Mute":
-            volumeControl_elem.click()
+        volume_control_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")))
+        
+        if volume_control_button.get_attribute("title") == "Mute":
+            volume_control_button.click()
 
         return 
 
     def __play_video__(self): 
-        play_button = self.WebDriver.find_element(By.CSS_SELECTOR, "#playButton") 
-        
-        if play_button.get_attribute("class") == "transport-button paused":
-            play_button.click()
+        play_video_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#playButton")))
+
+        if play_video_button.get_attribute("class") == "transport-button paused":
+            play_video_button.click()
 
         return
 
@@ -86,6 +84,6 @@ class APIEndpointFinder:
     def __is_camera_button__(self, potential_camera_button):
         return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
     
-    #def __add_endpoint_URL__(self): 
-    #
-    #    return 0
+    def __add_endpoint_URL__(self): 
+        
+        return 0
