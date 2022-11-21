@@ -27,7 +27,7 @@ class PanoptoVideoDownloader:
 Downloader = PanoptoVideoDownloader()
 
 #Add Panopto Video URL's here
-#TODO Change arguments given to downloader to specify location, potentially including overriden methods for maximum flexibility
+#TODO Change arguments given to downloader to specify location OR create a set_download_location as a function
 Downloader.add("https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d4e68f2a-038f-4846-b9ed-af4400d73902")
 Downloader.add("https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4acfcb21-72cc-4efd-be2c-af0000e0957e")
 
