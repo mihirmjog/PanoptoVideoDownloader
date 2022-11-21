@@ -16,11 +16,10 @@ class APIEndpointFinder:
     def get_URL_list(self, panopto_video_URL): 
         endpoint_URL_list = []
 
-
         self.WebDriver.get(panopto_video_URL)
         self.__kerberos_login__() 
 
-        while (True): #Waits until video player is accessible to Selenium. Can create infinite loop.
+        while (True): #Waits until controls of video player are accessible to Selenium. #TODO Prevent potential infinite loop
             try: 
                 self.__play_video__() 
                 self.__mute_video__()
@@ -29,11 +28,10 @@ class APIEndpointFinder:
             else:
                 break
                 
-        if self.__check_for_camera_expander__():
-            camera_expander_button = self.WebDriver.find_element(By.ID, "selectedSecondary")
-            self.__click_through_all_cameras__(camera_expander_button, True)
-        else:
-            self.__click_through_all_cameras__(None, False)
+        if self.WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if camera expander button is displayed
+            self.__click_through_camera_expander__()
+        else: #Video player does not have camera expander
+            self.__click_through_all_cameras__()
         
         return endpoint_URL_list
 
@@ -51,12 +49,6 @@ class APIEndpointFinder:
 
         return 
 
-    def __check_for_camera_expander__(self):
-        has_flyout_button =  self.WebDriver.find_element(By.ID, "selectedSecondary").is_displayed()
-        self.__escape__()
-
-        return has_flyout_button
-
     def __play_video__(self): 
         play_button = self.WebDriver.find_element(By.CSS_SELECTOR, "#playButton") 
         
@@ -65,24 +57,25 @@ class APIEndpointFinder:
 
         return
 
-    def __click_through_all_cameras__(self, camera_expander_button, has_camera_expander):
-        if has_camera_expander:
-            list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
-        else:
-            list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
+    def __click_through_camera_expander__(self):
+        camera_expander_button = self.WebDriver.find_element(By.ID, "selectedSecondary")
+        list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
+
+        for potential_camera_button in list_of_potential_camera_buttons:
+            if potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header":
+                camera_expander_button.click()
+                if potential_camera_button.is_displayed():
+                    potential_camera_button.click()
+                    WD.ActionChains(self.WebDriver).send_keys(Keys.ESCAPE).perform() #Presses escape key to close camera expander
+
+        return
+
+    def __click_through_all_cameras__(self):
+        list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
         
         for potential_camera_button in list_of_potential_camera_buttons:
             if potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header":
-                if has_camera_expander:
-                    camera_expander_button.click()
                 if potential_camera_button.is_displayed():
                     potential_camera_button.click()
-                    self.__escape__()
         
         return
-
-    def __escape__(self):
-        WD.ActionChains(self.WebDriver).send_keys(Keys.ESCAPE).perform()
-
-        return 
-
