@@ -26,8 +26,8 @@ class APIEndpointFinder:
         self.WebDriver.get(panopto_video_URL)
 
         self.__login_to_kerberos__()
-        self.__play_video__() 
         self.__mute_video__()
+        self.__play_video__() 
    
         if self.WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
             self.__click_through_camera_expander__()
@@ -45,7 +45,7 @@ class APIEndpointFinder:
             return 
 
     def __mute_video__(self):
-        volume_control_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")))
+        volume_control_button = self.__wait_until_element_is_clickable__(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
         
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
@@ -53,7 +53,7 @@ class APIEndpointFinder:
         return 
 
     def __play_video__(self): 
-        play_video_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#playButton")))
+        play_video_button = self.__wait_until_element_is_clickable__(By.CSS_SELECTOR, "#playButton")
 
         if play_video_button.get_attribute("class") == "transport-button paused":
             play_video_button.click()
@@ -80,6 +80,13 @@ class APIEndpointFinder:
                     potential_camera_button.click()
 
         return
+
+    def __wait_until_element_is_clickable__(self, locator, element):
+        target_element = WebDriverWait(self.WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+            EC.element_to_be_clickable((locator, element))
+        )
+
+        return target_element
 
     def __is_camera_button__(self, potential_camera_button):
         return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
