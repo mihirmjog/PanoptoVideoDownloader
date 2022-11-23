@@ -16,7 +16,6 @@ class PanoptoVideoDownloader:
 
         self.PanoptoVideoQueue.put(panopto_video_URL)
         
-        return 
     
     def start_downloads(self):
         APIEndpointsMap = {}
@@ -25,7 +24,7 @@ class PanoptoVideoDownloader:
             current_video_URL = self.PanoptoVideoQueue.get() 
             APIEndpointsMap[current_video_URL] = self.EndpointURLFinder.get_URL_list(current_video_URL)
 
-        return
+
 
     #def set_download_location(self, download_location): 
     #    self.download_location = download_location
