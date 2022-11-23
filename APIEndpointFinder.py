@@ -17,14 +17,14 @@ class APIEndpointFinder:
         chrome_options.add_argument("user-data-dir=C:/Users/mihir/AppData/Local/Google/Chrome/User Data") #Need to use preexisting chrome profile to autofill kerberos credentials and bypass 2FA
         chrome_options.add_argument("remote-debugging-port=9222")   
         chrome_options.add_experimental_option('perfLoggingPrefs', {
-            'enableNetwork': True
-            }) 
+            'traceCategories': "devtools.Network.requestWillBeSent",
+            'enablePage'     : False
+            })  
         self.WebDriver = WD.Chrome(options = chrome_options, desired_capabilities= chrome_capabilities)
-        
         self.WebDriver.maximize_window()
 
     def get_URL_list(self, panopto_video_URL): 
-        #clear
+        self.WebDriver.get_log('browser')  #clears browser performance logs
         self.WebDriver.get(panopto_video_URL)
 
         self.__login_to_kerberos()
@@ -38,9 +38,12 @@ class APIEndpointFinder:
         
         webdriver_logs = self.WebDriver.get_log('performance')
         #TODO Check if num_cameras equals number of clicks, throw exception otherwise
-        endpoint_URL_list = self.__create_endpoint_URL_list(webdriver_logs)
+        list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
 
-        return endpoint_URL_list
+        return list_of_endpoint_URLs
+
+    def close_finder(self):
+        self.WebDriver.quit()
 
     def __login_to_kerberos(self):
         try: 
@@ -75,8 +78,11 @@ class APIEndpointFinder:
         list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
         
         for potential_camera_button in list_of_potential_camera_buttons:
-            if self.__is_camera_button(potential_camera_button) and potential_camera_button.is_displayed():
-                    potential_camera_button.click()
+            if not self.__is_camera_button(potential_camera_button):
+                continue
+
+            elif potential_camera_button.is_displayed():
+                potential_camera_button.click()
 
     def __wait_until_element_is_clickable(self, locator, element):
         target_element = WebDriverWait(self.WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
@@ -88,8 +94,21 @@ class APIEndpointFinder:
     def __is_camera_button(self, potential_camera_button):
         return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
     
-    def __create_endpoint_URL_list(self, webdriver_logs): 
-        endpoint_URL_list = []
+    def __create_endpoint_URLs_list(self, webdriver_logs): 
+        set_of_endpoint_URLs = set()
         for log in webdriver_logs:
-            print(log)
-        return        
+            if "index.m3u8" not in log['message']:
+                continue
+                
+            log_message = json.loads(log['message'])
+            try:
+                endpoint_URL = set_of_endpoint_URLs.add(log_message['message']['params']['request']['url'])
+            except:
+                continue
+            else:
+                if endpoint_URL is not None:
+                    set_of_endpoint_URLs.add(endpoint_URL)
+                    
+        list_of_endpoint_URLs = list(set_of_endpoint_URLs)
+
+        return list_of_endpoint_URLs
