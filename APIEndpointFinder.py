@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import json
 
-class APIEndpointFinder:
+class APIEndpointFinder: 
     '''Provides a list of the relevant API Endpoint URLs used by the Panapoto Video Player'''
     
     def __init__(self):
@@ -20,34 +20,34 @@ class APIEndpointFinder:
             'traceCategories': "devtools.Network.requestWillBeSent",
             'enablePage'     : False
             })  
-        self.WebDriver = WD.Chrome(options = chrome_options, desired_capabilities= chrome_capabilities)
-        self.WebDriver.maximize_window()
+        self.__WebDriver = WD.Chrome(options = chrome_options, desired_capabilities= chrome_capabilities)
+        self.__WebDriver.maximize_window()
 
     def get_URL_list(self, panopto_video_URL): 
-        self.WebDriver.get_log('browser')  #clears browser performance logs
-        self.WebDriver.get(panopto_video_URL)
+        self.__WebDriver.get_log('browser')  #clears browser performance logs
+        self.__WebDriver.get(panopto_video_URL)
 
         self.__login_to_kerberos()
         self.__mute_video()
         self.__play_video() 
 
-        if self.WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
+        if self.__WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
             self.__click_through_camera_expander()
         else: #Video player does not have camera expander
             self.__click_through_all_cameras()
         
-        webdriver_logs = self.WebDriver.get_log('performance')
+        webdriver_logs = self.__WebDriver.get_log('performance')
         #TODO Check if num_cameras equals number of clicks, throw exception otherwise
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
 
         return list_of_endpoint_URLs
 
     def close_finder(self):
-        self.WebDriver.quit()
+        self.__WebDriver.quit()
 
     def __login_to_kerberos(self):
         try: 
-            login_button = self.WebDriver.find_element(By.NAME, "Submit")
+            login_button = self.__WebDriver.find_element(By.NAME, "Submit")
             login_button.click()
         finally: 
             return 
@@ -65,17 +65,17 @@ class APIEndpointFinder:
             play_video_button.click()
 
     def __click_through_camera_expander(self):
-        camera_expander_button = self.WebDriver.find_element(By.ID, "selectedSecondary")
-        list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
+        camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
+        list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
 
         for potential_camera_button in list_of_potential_camera_buttons:
             if self.__is_camera_button(potential_camera_button):
                 camera_expander_button.click()
                 potential_camera_button.click() 
-                WD.ActionChains(self.WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
+                WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
 
     def __click_through_all_cameras(self):
-        list_of_potential_camera_buttons = self.WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
+        list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
         
         for potential_camera_button in list_of_potential_camera_buttons:
             if not self.__is_camera_button(potential_camera_button):
@@ -85,7 +85,7 @@ class APIEndpointFinder:
                 potential_camera_button.click()
 
     def __wait_until_element_is_clickable(self, locator, element):
-        target_element = WebDriverWait(self.WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+        target_element = WebDriverWait(self.__WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
             EC.element_to_be_clickable((locator, element))
         )
 
