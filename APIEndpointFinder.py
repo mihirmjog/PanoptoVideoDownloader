@@ -12,7 +12,9 @@ class APIEndpointFinder:
     
     def __init__(self):
         chrome_capabilities = DesiredCapabilities.CHROME.copy()
-        chrome_capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
+        chrome_capabilities["goog:loggingPrefs"] = {
+        "performance"        : "ALL",
+        "level"              : "INFO"}
         chrome_options = WD.ChromeOptions()
         chrome_options.add_argument("user-data-dir=C:/Users/mihir/AppData/Local/Google/Chrome/User Data") #Need to use preexisting chrome profile to autofill kerberos credentials and bypass 2FA
         chrome_options.add_argument("remote-debugging-port=9222")   
@@ -20,10 +22,12 @@ class APIEndpointFinder:
             'traceCategories': "devtools.Network.requestWillBeSent",
             'enablePage'     : False
             })  
+        self.__num_of_cameras = -1
         self.__WebDriver = WD.Chrome(options = chrome_options, desired_capabilities= chrome_capabilities)
         self.__WebDriver.maximize_window()
 
     def get_URL_list(self, panopto_video_URL): 
+        self.__num_of_cameras = 0
         self.__WebDriver.get_log('browser')  #clears browser performance logs
         self.__WebDriver.get(panopto_video_URL)
 
@@ -37,8 +41,8 @@ class APIEndpointFinder:
             self.__click_through_all_cameras()
         
         webdriver_logs = self.__WebDriver.get_log('performance')
-        #TODO Check if num_cameras equals number of clicks, throw exception otherwise
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
+        self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
 
         return list_of_endpoint_URLs
 
@@ -72,6 +76,7 @@ class APIEndpointFinder:
             if self.__is_camera_button(potential_camera_button):
                 camera_expander_button.click()
                 potential_camera_button.click() 
+                self.__num_of_cameras += 1
                 WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
 
     def __click_through_all_cameras(self):
@@ -82,25 +87,18 @@ class APIEndpointFinder:
                 continue
 
             elif potential_camera_button.is_displayed():
+                self.__num_of_cameras += 1
                 potential_camera_button.click()
 
-    def __wait_until_element_is_clickable(self, locator, element):
-        target_element = WebDriverWait(self.__WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
-            EC.element_to_be_clickable((locator, element))
-        )
-
-        return target_element
-
-    def __is_camera_button(self, potential_camera_button):
-        return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
-    
     def __create_endpoint_URLs_list(self, webdriver_logs): 
         set_of_endpoint_URLs = set()
+        
         for log in webdriver_logs:
             if "index.m3u8" not in log['message']:
                 continue
                 
             log_message = json.loads(log['message'])
+            #TODO Remove try/else block
             try:
                 endpoint_URL = set_of_endpoint_URLs.add(log_message['message']['params']['request']['url'])
             except:
@@ -112,3 +110,20 @@ class APIEndpointFinder:
         list_of_endpoint_URLs = list(set_of_endpoint_URLs)
 
         return list_of_endpoint_URLs
+    
+    def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):
+        if len(list_of_endpoint_URLs) == (self.__num_of_cameras + 1):
+            return
+        
+        else:
+            raise Exception("Incorrect number of cameras for the URL:" + self.__WebDriver.current_url)
+
+    def __wait_until_element_is_clickable(self, locator, element):
+        target_element = WebDriverWait(self.__WebDriver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+            EC.element_to_be_clickable((locator, element))
+        )
+
+        return target_element
+
+    def __is_camera_button(self, potential_camera_button):
+        return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
