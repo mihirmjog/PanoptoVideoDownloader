@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import json
 
-class APIEndpointFinder: 
+class PanoptoEndpointFinder: 
     '''Provides a list of the relevant API Endpoint URLs used by the Panapoto Video Player'''
     
     def __init__(self):
@@ -19,11 +19,11 @@ class APIEndpointFinder:
         chrome_options.add_argument("user-data-dir=C:/Users/mihir/AppData/Local/Google/Chrome/User Data") #Need to use preexisting chrome profile to autofill kerberos credentials and bypass 2FA
         chrome_options.add_argument("remote-debugging-port=9222")   
         chrome_options.add_experimental_option('perfLoggingPrefs', {
-            'traceCategories': "devtools.Network.requestWillBeSent",
+            'traceCategories': 'devtools.Network.requestWillBeSent',
             'enablePage'     : False
             })  
-        self.__num_of_cameras = -1
         self.__WebDriver = WD.Chrome(options = chrome_options, desired_capabilities= chrome_capabilities)
+        self.__num_of_cameras = -1
         self.__WebDriver.maximize_window()
 
     def get_URL_list(self, panopto_video_URL): 
