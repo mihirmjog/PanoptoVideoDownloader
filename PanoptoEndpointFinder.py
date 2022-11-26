@@ -1,18 +1,16 @@
 from selenium import webdriver as WD
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import json
-import ConfiguredWD
+import ConfiguredWD as Configured_WD
+from time import sleep
 #TODO Determine what Seleniun dependencies should be deleted
 class PanoptoEndpointFinder: 
     '''Provides a list of the relevant API Endpoint URLs used by the Panapoto Video Player'''
     
     def __init__(self):  
-        self.__WebDriver = ConfiguredWD.ConfiguredWD(logging = True)
+        self.__WebDriver = Configured_WD.ConfiguredWD(logging = True)
         self.__num_of_cameras = -1
         
 
@@ -33,7 +31,7 @@ class PanoptoEndpointFinder:
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
         self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
-        
+
         return list_of_endpoint_URLs
 
     def close_finder(self):
@@ -47,13 +45,13 @@ class PanoptoEndpointFinder:
             return 
 
     def __mute_video(self):
-        volume_control_button = self.__WebDriver.wait_for_clickable_element(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
+        volume_control_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
         
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
 
     def __play_video(self): 
-        play_video_button = self.__WebDriver.wait_for_clickable_element(By.CSS_SELECTOR, "#playButton")
+        play_video_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
 
         if play_video_button.get_attribute("class") == "transport-button paused":
             play_video_button.click()
@@ -68,6 +66,7 @@ class PanoptoEndpointFinder:
                 potential_camera_button.click() 
                 self.__num_of_cameras += 1
                 WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
+                sleep(0.2)
 
     def __click_through_all_cameras(self):
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
@@ -79,6 +78,7 @@ class PanoptoEndpointFinder:
             elif potential_camera_button.is_displayed():
                 self.__num_of_cameras += 1
                 potential_camera_button.click()
+                sleep(0.2)
 
     def __create_endpoint_URLs_list(self, webdriver_logs): 
         set_of_endpoint_URLs = set()
@@ -100,7 +100,7 @@ class PanoptoEndpointFinder:
         list_of_endpoint_URLs = list(set_of_endpoint_URLs)
 
         return list_of_endpoint_URLs
-    
+
     def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):
         if len(list_of_endpoint_URLs) == (self.__num_of_cameras + 1):
             return
@@ -109,4 +109,6 @@ class PanoptoEndpointFinder:
             raise Exception("Incorrect number of cameras for the URL:" + self.__WebDriver.current_url)
 
     def __is_camera_button(self, potential_camera_button):
-        return potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
+        is_camera = potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
+        
+        return is_camera
