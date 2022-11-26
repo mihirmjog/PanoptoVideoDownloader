@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import *
-
+#TODO Determine what Seleniun dependencies should be deleted
 class Driver: 
     '''Driver Class'''
 
@@ -22,7 +22,7 @@ class Driver:
         download_location.join("/")
         self.__download_location = target_directory
 
-    def add(self, video_URL, folder_name):
+    def add(self, folder_name, video_URL):
         if self.__download_location == None:
             raise Exception("Set Download Location first!")
         
@@ -37,16 +37,16 @@ class Driver:
     def start_downloads(self):
 
         while self.__DownloadQueue:
-            current_download_item = self.__DownloadQueue.pop()
-            (current_download_item_parent_folder, current_download_URL) = current_download_item
+            current_download_item = self.__DownloadQueue.popleft()
+            (parent_folder_of_current_download_item, current_download_URL) = current_download_item
             
             if "panopto.com" in current_download_URL:
-                self.__handle_panopto_videos(current_download_item_parent_folder, current_download_URL) #Reinserts download URL of every camera of a panopto video
-            else:
-                self.__download_current_item(current_download_item_parent_folder, current_download_URL)
+                self.__handle_panopto_videos(parent_folder_of_current_download_item, current_download_URL) #Reinserts download URL of every camera of a panopto video at left-side of the Queue
+        
+            self.__download_current_item(parent_folder_of_current_download_item, current_download_URL)
             
         self.__PanoptoEndpointFinder.close_finder()
-        #self.__close_downloader() 
+        #self.__close_downloader() #TODO Write close_downloader() function
 
     def __handle_panopto_videos(self, parent_folder, video_URL):
         list_of_panopto_endpoint_URLs = self.__PanoptoEndpointFinder.get_URL_list(video_URL)
@@ -75,8 +75,8 @@ video_downloader.set_download_location(r"C:\Users\mihir\Documents\Test")
 
 
 #2) Add Panopto Video URL's here and name of parent folder
-video_downloader.add("https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d4e68f2a-038f-4846-b9ed-af4400d73902", None)
-video_downloader.add("https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4acfcb21-72cc-4efd-be2c-af0000e0957e", None)
+video_downloader.add(None, "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d4e68f2a-038f-4846-b9ed-af4400d73902")
+video_downloader.add(None, "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4acfcb21-72cc-4efd-be2c-af0000e0957e")
 
 video_downloader.start_downloads()
 #------------------------------------------------------------------------------------------------------------------------------------------     
