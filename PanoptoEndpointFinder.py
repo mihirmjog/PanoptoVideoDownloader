@@ -63,10 +63,11 @@ class PanoptoEndpointFinder:
         for potential_camera_button in list_of_potential_camera_buttons:
             if self.__is_camera_button(potential_camera_button):
                 camera_expander_button.click()
-                potential_camera_button.click() 
+                potential_camera_button.click()
+                sleep(1) 
                 self.__num_of_cameras += 1
                 WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
-                sleep(0.2)
+                sleep(1)
 
     def __click_through_all_cameras(self):
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
@@ -78,7 +79,7 @@ class PanoptoEndpointFinder:
             elif potential_camera_button.is_displayed():
                 self.__num_of_cameras += 1
                 potential_camera_button.click()
-                sleep(0.2)
+                sleep(1)
 
     def __create_endpoint_URLs_list(self, webdriver_logs): 
         set_of_endpoint_URLs = set()

@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.remote import webelement
 
 class ConfiguredWD(WD.Chrome):
     '''Subclassed WebDriver configured with user profile.'''
@@ -19,6 +20,7 @@ class ConfiguredWD(WD.Chrome):
         chrome_options.add_argument('allow-running-insecure-content')
         chrome_options.add_argument('allow-insecure-localhost')
         chrome_options.add_argument('unsafely-treat-insecure-origin-as-secure')
+        chrome_options.add_argument('--log-level=3') #Potentially ignores important errors from chrome
         chrome_capabilities = DesiredCapabilities.CHROME.copy()
         chrome_capabilities['acceptInsecureCerts'] = True
         chrome_capabilities['acceptSslCerts'] = True
@@ -35,9 +37,12 @@ class ConfiguredWD(WD.Chrome):
         
 
     def get_element_when_accessible(self, locator, element):
-        target_element = WebDriverWait(self, 60, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
-            EC.element_to_be_clickable((locator, element))
+        target_element = WebDriverWait(self, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+            EC.element_to_be_clickable((locator, element)) 
         )
+        
+        while not target_element.is_displayed():
+            continue
 
         return target_element
 
