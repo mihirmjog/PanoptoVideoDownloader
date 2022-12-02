@@ -83,7 +83,7 @@ class Driver:
         self.__type_in_new_download_location(download_dir)
         self.__wait_until_download_is_added()
         self.__start_download_for_current_item()
-        while not self.__has_nfo_file(download_dir):
+        while not self.__has_info_file(download_dir):
             sleep(0.5)
             continue
         return
@@ -137,7 +137,6 @@ class Driver:
         
         raise Exception("Download is not added")
 
-
     def __start_download_for_current_item(self):
         sleep(1)
         actions_hyperlink = self.__WebDriver.get_element_when_accessible(By.XPATH, '//*[@id="gwtContent"]/div/div[1]/div[1]/div[2]/div[7]/a')
@@ -147,12 +146,12 @@ class Driver:
         add_to_downloads_button.click()
         sleep(1)
 
-    def __has_nfo_file(self, target_nfo_directory):
-        for potential_nfo_file in os.listdir(target_nfo_directory):
-            potential_nfo_file_as_str = potential_nfo_file.__str__()
-            if potential_nfo_file_as_str.endswith("info"):
-                nfo_file_directory = target_nfo_directory.__str__() + "\\" + potential_nfo_file_as_str
-                os.remove(nfo_file_directory)
+    def __has_info_file(self, target_nfo_directory):
+        for potential_info_file in os.listdir(target_nfo_directory):
+            potential_info_file_as_str = potential_info_file.__str__()
+            if potential_info_file_as_str.endswith("info"):
+                info_file_directory = target_nfo_directory.__str__() + "\\" + potential_info_file_as_str #Avoids use of __apend_filepath() which
+                os.remove(info_file_directory)                                                          #returns pathlib object instead of string
                 return True
         return False
 
@@ -183,6 +182,5 @@ video_downloader.set_download_location(r"C:\Users\mihir\Documents\MIT\6.1810 Ope
 
 
 #2) Add Panopto Video URL's here and name of parent folder
-
 video_downloader.start_downloads()
 #------------------------------------------------------------------------------------------------------------------------------------------     
