@@ -75,9 +75,9 @@ class Driver:
         self.__type_in_new_download_location(WebDriver, download_dir)
         self.__wait_until_download_is_added(WebDriver)
         self.__start_download_for_current_item(WebDriver)
-        while not self.__has_info_file(download_dir):
-            sleep(0.5)
-            continue
+        while not self.__has_info_file(download_dir): #JDownloader creates an "info" file after download finishes.
+            sleep(0.5)                                #Once the info file is detected, __has_info_file() removes
+            continue                                  #it before exitng the while loop.
         WebDriver.quit()
         return
 
@@ -117,11 +117,11 @@ class Driver:
         continue_button = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/div[1]/button[1]")
         continue_button.click()
 
-    def __wait_until_download_is_added(self, WebDriver):
-        for num_of_refreshes in range(10):
+    def __wait_until_download_is_added(self, WebDriver): 
+        for num_of_refreshes in range(10):               
             try:
-                expander_button = WebDriver.get_element_when_accessible(By.CLASS_NAME, "expandButton")
-                expander_button.click()
+                package_expander_button = WebDriver.get_element_when_accessible(By.CLASS_NAME, "expandButton")
+                package_expander_button.click()
                 return
             except:
                 WebDriver.refresh()
@@ -143,7 +143,7 @@ class Driver:
             potential_info_file_as_str = potential_info_file.__str__()
             if potential_info_file_as_str.endswith("info"):
                 info_file_directory = target_nfo_directory.__str__() + "\\" + potential_info_file_as_str #Avoids use of __apend_filepath() which
-                os.remove(info_file_directory)                                                          #returns pathlib object instead of string
+                os.remove(info_file_directory)                                                           #returns pathlib object instead of string
                 return True
         return False
 
