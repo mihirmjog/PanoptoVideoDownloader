@@ -31,7 +31,6 @@ class PanoptoEndpointFinder:
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
         self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
-
         return list_of_endpoint_URLs
 
     def close_finder(self):
@@ -103,9 +102,10 @@ class PanoptoEndpointFinder:
         return list_of_endpoint_URLs
 
     def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):
-        if len(list_of_endpoint_URLs) == (self.__num_of_cameras + 1):
+        if len(list_of_endpoint_URLs) == 0:
+            raise Exception("No endpoints found!")
+        elif len(list_of_endpoint_URLs) == (self.__num_of_cameras + 1):
             return
-        
         else:
             raise Exception("Incorrect number of cameras for the URL:" + self.__WebDriver.current_url)
 

@@ -69,7 +69,7 @@ class Driver:
                 self.__download_current_item(download_dir_for_current_item, current_download_URL)
             except:
                 self.__error_log_dict[current_download_URL] = None #TODO Add actual error messages as value
-        self.__WebDriver.close()
+        self.__WebDriver.quit()
         self.__print_status()
 
     
@@ -83,7 +83,6 @@ class Driver:
         self.__type_in_new_download_location(download_dir)
         self.__wait_until_download_is_added()
         self.__start_download_for_current_item()
-        #self.__check_for_error()
         while not self.__has_nfo_file(download_dir):
             sleep(0.5)
             continue
@@ -180,13 +179,10 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"C:\Users\mihir\Documents\MIT\6.1900 Introduction to Low-level Programming in C and Assembly (F22B) [NEW]\Material\Weekly Material\Week 5")
+video_downloader.set_download_location(r"C:\Users\mihir\Documents\MIT\6.1810 Operating Systems Engineering (F20) [6.S081]\Lecture Recordings & External Materials")
 
 
 #2) Add Panopto Video URL's here and name of parent folder
-#video_downloader.add("TestParentFolder", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d4e68f2a-038f-4846-b9ed-af4400d73902")
-video_downloader.add("Lecture", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=66a1b2c7-acbe-4b87-b4cd-af0000e095d8")
-
 
 video_downloader.start_downloads()
 #------------------------------------------------------------------------------------------------------------------------------------------     
