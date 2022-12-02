@@ -17,19 +17,16 @@ class Driver:
     def __init__(self):
         subprocess.Popen(['C:\Program Files\JDownloader\JDownloader\JDownloader2.exe'], stdout=subprocess.PIPE)
         self.__DownloadQueue = queue.Queue()        
-        self.__PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
         self.__download_location = None
         self.__set_of_download_URLs = set()
         self.__error_log_dict = {} #TODO Add try/except block where failed download URLs (potentially from incorrent num_of_cameras) are printed to console or in a log.txt
         #TODO Check length of video?
         
-
     def set_download_location(self, download_location): 
         target_directory = pathlib.Path(pathlib.PureWindowsPath(download_location).as_posix())
         self.__create_directory(target_directory)
         target_directory = self.__append_to_filepath(target_directory, "/") #TODO Place slash before folder_name
         self.__download_location = target_directory
-
 
     def add(self, folder_name, video_URL):
         if self.__download_location == None:
@@ -39,53 +36,49 @@ class Driver:
         else: 
             self.__set_of_download_URLs.add(video_URL)
 
-        relative_folder_name = "/" + folder_name
-        download_directory = self.__append_to_filepath(self.__download_location, relative_folder_name)
+        relative_folder_directory = "/" + folder_name
+        download_directory = self.__append_to_filepath(self.__download_location, relative_folder_directory)
         self.__create_directory(download_directory)
 
-        if "panopto.com" in video_URL:
-            try:
-                list_of_panopto_endpoints = self.__PanoptoEndpointFinder.get_URL_list(video_URL)
-            except:
-                self.__error_log_dict[video_URL] = None #TODO Add actual error messages as value
-            else:    
-                for panopto_endpoint in list_of_panopto_endpoints:
-                    download_item = (download_directory, panopto_endpoint)
-                    self.__DownloadQueue.put(download_item)
-        else:
-            download_item = (download_directory, video_URL)
-            self.__DownloadQueue.put(download_item)
+        download_item = (download_directory, video_URL)
+        self.__DownloadQueue.put(download_item)
     
     def start_downloads(self):
-        self.__PanoptoEndpointFinder.close_finder()
-        self.__WebDriver = Configured_WD.ConfiguredWD(logging = False)
-        self.__WebDriver.get("https://my.jdownloader.org")
-        self.__go_to_my_JDownloader()
-        
         while self.__DownloadQueue:
             current_download_item = self.__DownloadQueue.get()
             (download_dir_for_current_item, current_download_URL) = current_download_item
             try:
-                self.__download_current_item(download_dir_for_current_item, current_download_URL)
+                if "panopto.com" in current_download_URL:
+                    PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
+                    list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
+                    for panopto_endpoint in list_of_panopto_endpoints:
+                        self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
+                else:
+                    self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
             except:
                 self.__error_log_dict[current_download_URL] = None #TODO Add actual error messages as value
+            else:    
+                return list_of_panopto_endpoints
         self.__WebDriver.quit()
         self.__print_status()
 
-    
     def __create_directory(self, target_directory):
         target_directory.mkdir(parents=True, exist_ok= True)
 
     def __download_current_item(self, download_dir, download_URL):
         #TODO Check if sleep functions are necessary
-        self.__click_on_add_new_link()
-        self.__type_in_download_URL(download_URL)
-        self.__type_in_new_download_location(download_dir)
-        self.__wait_until_download_is_added()
-        self.__start_download_for_current_item()
+        WebDriver = Configured_WD.ConfiguredWD(logging = False)
+        WebDriver.get("https://my.jdownloader.org")
+        self.__go_to_my_JDownloader(WebDriver)
+        self.__click_on_add_new_link(WebDriver)
+        self.__type_in_download_URL(WebDriver, download_URL)
+        self.__type_in_new_download_location(WebDriver, download_dir)
+        self.__wait_until_download_is_added(WebDriver)
+        self.__start_download_for_current_item(WebDriver)
         while not self.__has_info_file(download_dir):
             sleep(0.5)
             continue
+        WebDriver.quit()
         return
 
     def __append_to_filepath(self, original_filepath, path_to_append_as_str):
@@ -94,55 +87,54 @@ class Driver:
         new_filepath = pathlib.Path(pathlib.PureWindowsPath(new_filepath_as_string).as_posix())
 
         return new_filepath
-
-    def __go_to_my_JDownloader(self):
-        my_jdownloader_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[1]/div[2]/div/div/div[2]/div[1]/div[2]/div/div/div/img")
+        
+    def __go_to_my_JDownloader(self, WebDriver):
+        my_jdownloader_button = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[1]/div[2]/div/div/div[2]/div[1]/div[2]/div/div/div/img")
         my_jdownloader_button.click()
 
-
-    def __click_on_add_new_link(self):
-        current_URL = self.__WebDriver.current_url
+    def __click_on_add_new_link(self, WebDriver):
+        current_URL = WebDriver.current_url
         link_collector_URL = current_URL.replace(":downloads", ":links")
-        self.__WebDriver.get(link_collector_URL)
-        add_links_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "//*[contains(text(),'Add links')]")
+        WebDriver.get(link_collector_URL)
+        add_links_button = WebDriver.get_element_when_accessible(By.XPATH, "//*[contains(text(),'Add links')]")
         add_links_button.click()
         sleep(1)
 
-    def __type_in_download_URL(self, download_URL):
-        download_URL_textbox = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/table/tbody/tr[1]/td[2]/div[1]/textarea")
+    def __type_in_download_URL(self, WebDriver, download_URL):
+        download_URL_textbox = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/table/tbody/tr[1]/td[2]/div[1]/textarea")
         download_URL_textbox.send_keys(download_URL)
 
-    def __type_in_new_download_location(self, target_directory):
-        choose_another_folder_link = self.__WebDriver.get_element_when_accessible(By.XPATH, "//a[contains(text(),'Choose another folder')]")
+    def __type_in_new_download_location(self, WebDriver, target_directory):
+        choose_another_folder_link = WebDriver.get_element_when_accessible(By.XPATH, "//a[contains(text(),'Choose another folder')]")
         choose_another_folder_link.click()
         sleep(1)
-        choose_another_folder_textbox = self.__WebDriver.get_element_when_accessible(By.XPATH, "//div[4]/div/div/div/div/input")
+        choose_another_folder_textbox = WebDriver.get_element_when_accessible(By.XPATH, "//div[4]/div/div/div/div/input")
         choose_another_folder_textbox.send_keys(target_directory.__str__())
         sleep(1)
-        OK_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/div[2]/div[1]/button[1]")
+        OK_button = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/div[2]/div[1]/button[1]")
         OK_button.click()   
         sleep(1)
-        continue_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/div[1]/button[1]")
+        continue_button = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[4]/div/div/div/div/div[1]/button[1]")
         continue_button.click()
 
-    def __wait_until_download_is_added(self):
+    def __wait_until_download_is_added(self, WebDriver):
         for num_of_refreshes in range(10):
             try:
-                expander_button = self.__WebDriver.get_element_when_accessible(By.CLASS_NAME, "expandButton")
+                expander_button = WebDriver.get_element_when_accessible(By.CLASS_NAME, "expandButton")
                 expander_button.click()
                 return
             except:
-                self.__WebDriver.refresh()
+                WebDriver.refresh()
                 continue
         
         raise Exception("Download is not added")
 
-    def __start_download_for_current_item(self):
+    def __start_download_for_current_item(self, WebDriver):
         sleep(1)
-        actions_hyperlink = self.__WebDriver.get_element_when_accessible(By.XPATH, '//*[@id="gwtContent"]/div/div[1]/div[1]/div[2]/div[7]/a')
+        actions_hyperlink = WebDriver.get_element_when_accessible(By.XPATH, '//*[@id="gwtContent"]/div/div[1]/div[1]/div[2]/div[7]/a')
         actions_hyperlink.click()
         sleep(1)
-        add_to_downloads_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div/div/a[1]")
+        add_to_downloads_button = WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div/div/a[1]")
         add_to_downloads_button.click()
         sleep(1)
 
@@ -178,9 +170,11 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"C:\Users\mihir\Documents\MIT\6.1810 Operating Systems Engineering (F20) [6.S081]\Lecture Recordings & External Materials")
+video_downloader.set_download_location(r"C:\Users\mihir\Documents\Test")
 
 
 #2) Add Panopto Video URL's here and name of parent folder
+video_downloader.add("Test", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=66a1b2c7-acbe-4b87-b4cd-af0000e095d8")
+#3) Start downloads
 video_downloader.start_downloads()
 #------------------------------------------------------------------------------------------------------------------------------------------     
