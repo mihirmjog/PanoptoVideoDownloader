@@ -54,12 +54,10 @@ class Driver:
                     for panopto_endpoint in list_of_panopto_endpoints:
                         self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
                 else:
-                    self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
-            except:
-                self.__error_log_dict[current_download_URL] = None #TODO Add actual error messages as value
-            else:    
-                return list_of_panopto_endpoints
-        self.__WebDriver.quit()
+                    self.__download_current_item(download_dir_for_current_item, current_download_URL)
+            except Exception as exception_message:
+                print(exception_message)
+                self.__error_log_dict[current_download_URL] = e #TODO Add actual error messages as value
         self.__print_status()
 
     def __create_directory(self, target_directory):
@@ -96,6 +94,7 @@ class Driver:
         current_URL = WebDriver.current_url
         link_collector_URL = current_URL.replace(":downloads", ":links")
         WebDriver.get(link_collector_URL)
+        WebDriver.refresh()
         add_links_button = WebDriver.get_element_when_accessible(By.XPATH, "//*[contains(text(),'Add links')]")
         add_links_button.click()
         sleep(1)
@@ -142,9 +141,12 @@ class Driver:
         for potential_info_file in os.listdir(target_nfo_directory):
             potential_info_file_as_str = potential_info_file.__str__()
             if potential_info_file_as_str.endswith("info"):
+                sleep(1)
                 info_file_directory = target_nfo_directory.__str__() + "\\" + potential_info_file_as_str #Avoids use of __apend_filepath() which
                 os.remove(info_file_directory)                                                           #returns pathlib object instead of string
                 return True
+            else:
+                sleep(0.5)
         return False
 
     def __print_status(self):
@@ -170,11 +172,10 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"C:\Users\mihir\Documents\Test")
-
 
 #2) Add Panopto Video URL's here and name of parent folder
-video_downloader.add("Test", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=66a1b2c7-acbe-4b87-b4cd-af0000e095d8")
+
+
 #3) Start downloads
 video_downloader.start_downloads()
 #------------------------------------------------------------------------------------------------------------------------------------------     

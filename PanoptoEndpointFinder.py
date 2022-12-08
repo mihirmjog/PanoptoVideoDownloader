@@ -30,7 +30,7 @@ class PanoptoEndpointFinder:
         
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
-        self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
+        #self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
         self.__WebDriver.quit()
 
         return list_of_endpoint_URLs
@@ -63,7 +63,7 @@ class PanoptoEndpointFinder:
             if self.__is_camera_button(potential_camera_button):
                 camera_expander_button.click()
                 potential_camera_button.click()
-                sleep(0.5) 
+                sleep(1) 
                 self.__num_of_cameras += 1
                 WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
 
@@ -77,6 +77,7 @@ class PanoptoEndpointFinder:
             elif potential_camera_button.is_displayed():
                 self.__num_of_cameras += 1
                 potential_camera_button.click()
+                sleep(1)
 
     def __create_endpoint_URLs_list(self, webdriver_logs): 
         set_of_endpoint_URLs = set()
