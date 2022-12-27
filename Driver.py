@@ -57,8 +57,11 @@ class Driver:
                     self.__download_current_item(download_dir_for_current_item, current_download_URL)
             except Exception as exception_message:
                 print(exception_message)
-                self.__error_log_dict[current_download_URL] = e #TODO Add actual error messages as value
-        self.__print_status()
+                self.__error_log_dict[current_download_URL] = exception_message #TODO Add actual error messages as value
+        try:
+            self.__print_status()
+        except Exception as exception_message:
+            print(exception_message)
 
     def __create_directory(self, target_directory):
         target_directory.mkdir(parents=True, exist_ok= True)
@@ -172,10 +175,14 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
+video_downloader.set_download_location(r"D:\MIT\6.5080 Multicore Programming (F2020) [6.836]\Course Content")
 
 #2) Add Panopto Video URL's here and name of parent folder
+video_downloader.add("Lecture 26", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=63693354-a3df-4afe-a5da-af6901255297")
 
 
 #3) Start downloads
 video_downloader.start_downloads()
+
+
 #------------------------------------------------------------------------------------------------------------------------------------------     
