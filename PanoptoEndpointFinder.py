@@ -112,6 +112,6 @@ class PanoptoEndpointFinder:
             raise Exception("Incorrect number of cameras for the URL:" + self.__WebDriver.current_url)
 
     def __is_camera_button(self, potential_camera_button):
-        is_camera = potential_camera_button.get_attribute("class") == "player-tab-header transport-button accented-tab object-video secondary-header"
+        is_camera = potential_camera_button.get_attribute("class").__contains__("player-tab-header transport-button accented-tab object-video secondary-header")
         
         return is_camera
