@@ -86,6 +86,9 @@ class PanoptoEndpointFinder:
             if "index.m3u8" not in log['message']:
                 continue
                 
+            if "index.m4a" in log['message']:
+                continue
+            
             log_message = json.loads(log['message'])
             #TODO Remove try/else block
             try:
