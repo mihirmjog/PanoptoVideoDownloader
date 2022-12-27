@@ -27,7 +27,8 @@ class PanoptoEndpointFinder:
             self.__click_through_camera_expander()
         else: #Video player does not have camera expander
             self.__click_through_all_cameras()
-        
+        sleep(2) 
+
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
         #self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false

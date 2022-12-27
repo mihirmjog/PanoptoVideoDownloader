@@ -48,10 +48,14 @@ class Driver:
             current_download_item = self.__DownloadQueue.get()
             (download_dir_for_current_item, current_download_URL) = current_download_item
             if "panopto.com" in current_download_URL:
-                PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
-                list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
-                for panopto_endpoint in list_of_panopto_endpoints:
-                    self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
+                try:
+                    PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
+                    list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
+                except Exception as exception_message:
+                    self.__error_log_dict[current_download_URL] = exception_message #TODO Add actual error messages as value
+                else:
+                    for panopto_endpoint in list_of_panopto_endpoints:
+                        self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
             else:
                 self.__download_current_item(download_dir_for_current_item, current_download_URL)
         self.__print_status()
@@ -75,7 +79,6 @@ class Driver:
                 continue                                  #it before exitng the while loop.
             WebDriver.quit()
         except Exception as exception_message:
-                print(exception_message)
                 self.__error_log_dict[download_URL] = exception_message #TODO Add actual error messages as value
         return
 
