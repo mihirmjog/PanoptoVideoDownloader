@@ -47,39 +47,36 @@ class Driver:
         while self.__DownloadQueue:
             current_download_item = self.__DownloadQueue.get()
             (download_dir_for_current_item, current_download_URL) = current_download_item
-            try:
-                if "panopto.com" in current_download_URL:
-                    PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
-                    list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
-                    for panopto_endpoint in list_of_panopto_endpoints:
-                        self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
-                else:
-                    self.__download_current_item(download_dir_for_current_item, current_download_URL)
-            except Exception as exception_message:
-                print(exception_message)
-                self.__error_log_dict[current_download_URL] = exception_message #TODO Add actual error messages as value
-        try:
-            self.__print_status()
-        except Exception as exception_message:
-            print(exception_message)
+            if "panopto.com" in current_download_URL:
+                PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
+                list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
+                for panopto_endpoint in list_of_panopto_endpoints:
+                    self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
+            else:
+                self.__download_current_item(download_dir_for_current_item, current_download_URL)
+        self.__print_status()
 
     def __create_directory(self, target_directory):
         target_directory.mkdir(parents=True, exist_ok= True)
 
     def __download_current_item(self, download_dir, download_URL):
-        #TODO Check if sleep functions are necessary
-        WebDriver = Configured_WD.ConfiguredWD(logging = False)
-        WebDriver.get("https://my.jdownloader.org")
-        self.__go_to_my_JDownloader(WebDriver)
-        self.__click_on_add_new_link(WebDriver)
-        self.__type_in_download_URL(WebDriver, download_URL)
-        self.__type_in_new_download_location(WebDriver, download_dir)
-        self.__wait_until_download_is_added(WebDriver)
-        self.__start_download_for_current_item(WebDriver)
-        while not self.__has_info_file(download_dir): #JDownloader creates an "info" file after download finishes.
-            sleep(0.5)                                #Once the info file is detected, __has_info_file() removes
-            continue                                  #it before exitng the while loop.
-        WebDriver.quit()
+        try:
+            #TODO Check if sleep functions are necessary
+            WebDriver = Configured_WD.ConfiguredWD(logging = False)
+            WebDriver.get("https://my.jdownloader.org")
+            self.__go_to_my_JDownloader(WebDriver)
+            self.__click_on_add_new_link(WebDriver)
+            self.__type_in_download_URL(WebDriver, download_URL)
+            self.__type_in_new_download_location(WebDriver, download_dir)
+            self.__wait_until_download_is_added(WebDriver)
+            self.__start_download_for_current_item(WebDriver)
+            while not self.__has_info_file(download_dir): #JDownloader creates an "info" file after download finishes.
+                sleep(0.5)                                #Once the info file is detected, __has_info_file() removes
+                continue                                  #it before exitng the while loop.
+            WebDriver.quit()
+        except Exception as exception_message:
+                print(exception_message)
+                self.__error_log_dict[download_URL] = exception_message #TODO Add actual error messages as value
         return
 
     def __append_to_filepath(self, original_filepath, path_to_append_as_str):
