@@ -33,7 +33,10 @@ class PanoptoEndpointFinder:
         #self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
         self.__WebDriver.quit()
 
-        return list_of_endpoint_URLs
+        if not list_of_endpoint_URLs:
+            raise Exception("Empty Endpoint list for " + panopto_video_URL)
+        else:
+            return list_of_endpoint_URLs
 
     def __login_to_kerberos(self):
         sleep(1)
