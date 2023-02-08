@@ -111,7 +111,9 @@ class PanoptoEndpointFinder:
                     set_of_endpoint_URLs.add(endpoint_URL)
                     
         list_of_endpoint_URLs = list(set_of_endpoint_URLs)
-
+        if list_of_endpoint_URLs is False:
+            raise Exception("No endpoints found")
+        
         return list_of_endpoint_URLs
 
     def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):
