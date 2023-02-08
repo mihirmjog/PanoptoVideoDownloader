@@ -41,11 +41,14 @@ class PanoptoEndpointFinder:
 
     def __login_to_kerberos(self):
         sleep(1)
-        try: 
-            login_button = self.__WebDriver.find_element(By.NAME, "Submit")
-            login_button.click()
-        finally: 
+        current_URL = self.__WebDriver.current_url
+        if "https://idp.mit.edu" not in current_URL:
             return 
+
+        login_button = self.__WebDriver.find_element(By.NAME, "Submit")
+        login_button.click()
+
+        return 
 
     def __mute_video(self):
         volume_control_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
