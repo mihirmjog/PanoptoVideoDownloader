@@ -37,7 +37,7 @@ class ConfiguredWD(WD.Chrome):
         
 
     def get_element_when_accessible(self, locator, element):
-        target_element = WebDriverWait(self, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+        target_element = WebDriverWait(self, 3, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
             EC.element_to_be_clickable((locator, element)) 
         )
         
