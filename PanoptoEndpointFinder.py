@@ -25,7 +25,7 @@ class PanoptoEndpointFinder:
 
         if self.__WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
             self.__click_through_camera_expander()
-        else: #Video player does not have camera expander
+        else: 
             self.__click_through_all_cameras()
         sleep(2) 
 
@@ -53,16 +53,16 @@ class PanoptoEndpointFinder:
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
 
-    def __play_video(self): 
-        play_video_button = self.__get_play_button()
-        
-        if play_video_button.get_attribute("class") == "transport-button paused":
-            play_video_button.click()
+    def __play_video(self):
+        play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton") 
 
-    def __get_play_button(self):
-        play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
         if play_button is None:
-            play_button = self.__WebDriver.get_element_when_accessible(By.ID, "playIcon")           
+            play_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/form/div[3]/div[4]/div[3]/div[3]/i[1]")
+            play_button.click()
+        else:
+            if play_button.get_attribute("class") == "transport-button paused":
+                play_button.click()
+
 
         return play_button
     
