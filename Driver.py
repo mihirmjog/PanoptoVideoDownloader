@@ -51,8 +51,8 @@ class Driver:
                 try:
                     PanoptoEndpointFinder = PEF.PanoptoEndpointFinder()
                     list_of_panopto_endpoints = PanoptoEndpointFinder.get_URL_list(current_download_URL)
-                except Exception as exception_message:
-                    self.__error_log_dict[current_download_URL] = exception_message #TODO Add actual error messages as value
+                #except Exception as exception_message:
+                #    self.__error_log_dict[current_download_URL] = exception_message #TODO Add actual error messages as value
                 else:
                     for panopto_endpoint in list_of_panopto_endpoints:
                         self.__download_current_item(download_dir_for_current_item, panopto_endpoint)
