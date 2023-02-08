@@ -54,11 +54,18 @@ class PanoptoEndpointFinder:
             volume_control_button.click()
 
     def __play_video(self): 
-        play_video_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
-
+        play_video_button = self.__get_play_button()
+        
         if play_video_button.get_attribute("class") == "transport-button paused":
             play_video_button.click()
 
+    def __get_play_button(self):
+        play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
+        if play_button is None:
+            play_button = self.__WebDriver.get_element_when_accessible(By.ID, "playIcon")           
+
+        return play_button
+    
     def __click_through_camera_expander(self):
         camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")

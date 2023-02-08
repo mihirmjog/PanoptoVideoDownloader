@@ -26,11 +26,11 @@ class ConfiguredWD(WD.Chrome):
         chrome_capabilities['acceptSslCerts'] = True
         if logging:
             chrome_capabilities["goog:loggingPrefs"] = {
-            "performance"        : "ALL",
-            "level"              : "INFO"}
+                "performance"        : "ALL",
+                "level"              : "INFO"}
             chrome_options.add_experimental_option('perfLoggingPrefs', {
-            'traceCategories': 'devtools.Network.requestWillBeSent',
-            'enablePage'     : False
+                'traceCategories': 'devtools.Network.requestWillBeSent',
+                'enablePage'     : False
             })
         super().__init__(options = chrome_options, desired_capabilities= chrome_capabilities)
         self.maximize_window()

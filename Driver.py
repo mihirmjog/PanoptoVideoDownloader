@@ -175,10 +175,9 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"D:\MIT\6.5080 Multicore Programming (F2020) [6.836]\Course Content")
+video_downloader.set_download_location()
 
 #2) Add Panopto Video URL's here and name of parent folder
-video_downloader.add("Lecture 26", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=63693354-a3df-4afe-a5da-af6901255297")
 
 
 #3) Start downloads
