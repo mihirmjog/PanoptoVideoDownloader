@@ -17,6 +17,9 @@ class PanoptoEndpointFinder:
     def get_URL_list(self, panopto_video_URL): 
         self.__num_of_cameras = 0
         self.__WebDriver.get_log('browser')  #clears browser performance logs
+        
+        if "Embed" in panopto_video_URL:
+            panopto_video_URL = panopto_video_URL.replace("Embed", "Viewer")
         self.__WebDriver.get(panopto_video_URL)
 
         self.__login_to_kerberos()
@@ -56,18 +59,11 @@ class PanoptoEndpointFinder:
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
 
-    def __play_video(self):
-        play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton") 
-
-        if play_button is None:
-            play_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/form/div[3]/div[4]/div[3]/div[3]/i[1]")
+    def __play_video(self): 
+        play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
+        
+        if play_button.get_attribute("class") == "transport-button paused":
             play_button.click()
-        else:
-            if play_button.get_attribute("class") == "transport-button paused":
-                play_button.click()
-
-
-        return play_button
     
     def __click_through_camera_expander(self):
         camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
@@ -121,7 +117,7 @@ class PanoptoEndpointFinder:
 
     def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):
         if len(list_of_endpoint_URLs) == 0:
-            raise Exception("No endpoints found!")
+            raise Exception("No endpoints found")
         elif len(list_of_endpoint_URLs) == (self.__num_of_cameras + 1):
             return
         else:
