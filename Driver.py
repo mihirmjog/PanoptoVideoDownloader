@@ -164,16 +164,9 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"D:\MIT\6.5620[J] Cryptography and Cryptanalysis (F22) [6.857]\Lecture Videos")
+
 
 #2) Add Panopto Video URL's here and name of parent folder
-video_downloader.add("Lecture 20", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7c4bdf51-d534-4989-8438-af4b00d73102")
-video_downloader.add("Lecture 21", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=809ed765-b238-41cf-b0be-af5300669485")
-video_downloader.add("Lecture 22", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=359fc140-03f2-4e9a-81c9-af5900d6aeff")
-video_downloader.add("Lecture 23", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=172d2a9a-eb3d-424d-afeb-af5900d70d90&fbclid=IwAR3sRfoTgL51p5G0uHnptBvcml15li_ZLXh2S08vinNA-4EGEchRpJx2QyU")
-video_downloader.add("Lecture 24", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=93254a33-215a-44bf-9225-af6000d6c3c7")
-video_downloader.add("Lecture 25", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=47b1595d-d24c-47cf-b4bc-af6000d71fcf")
-
 
 #3) Start downloads
 video_downloader.start_downloads()
