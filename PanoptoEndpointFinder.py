@@ -64,7 +64,7 @@ class PanoptoEndpointFinder:
         
         if play_button.get_attribute("class") == "transport-button paused":
             play_button.click()
-    
+            
     def __click_through_camera_expander(self):
         camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
