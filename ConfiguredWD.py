@@ -32,12 +32,11 @@ class ConfiguredWD(WD.Chrome):
                 'traceCategories': 'devtools.Network.requestWillBeSent',
                 'enablePage'     : False
             })
-        super().__init__(options = chrome_options, desired_capabilities= chrome_capabilities)
+        super().__init__(options = chrome_options, desired_capabilities = chrome_capabilities)
         self.maximize_window()
         
-
     def get_element_when_accessible(self, locator, element):
-        target_element = WebDriverWait(self, 3, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
+        target_element = WebDriverWait(self, 5, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException]).until(
             EC.element_to_be_clickable((locator, element)) 
         )
         
@@ -45,6 +44,3 @@ class ConfiguredWD(WD.Chrome):
             continue
 
         return target_element
-
-        
-
