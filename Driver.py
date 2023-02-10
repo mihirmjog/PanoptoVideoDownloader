@@ -44,6 +44,9 @@ class Driver:
         self.__DownloadQueue.put(download_item)
     
     def start_downloads(self):
+        if not self.__DownloadQueue:
+            raise Exception("Add videos with add() before invoking start_downloads()")
+         
         while self.__DownloadQueue:
             current_download_item = self.__DownloadQueue.get()
             (download_dir_for_current_item, current_download_URL) = current_download_item
@@ -164,9 +167,11 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-
+video_downloader.set_download_location(r"D:\MIT\6.5660 Computer Systems Security\Lecture Videos")
 
 #2) Add Panopto Video URL's here and name of parent folder
+video_downloader.add("LEC 01", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=af8f557e-21a0-4e79-a0ed-afa1011792dc")
+video_downloader.add("LEC 02", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=978e45fb-d132-40b8-b642-afa10117de2c")
 
 #3) Start downloads
 video_downloader.start_downloads()
