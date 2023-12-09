@@ -167,11 +167,10 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location(r"D:\MIT\6.5660 Computer Systems Security\Lecture Videos")
+video_downloader.set_download_location()
 
-#2) Add Panopto Video URL's here and name of parent folder
-video_downloader.add("LEC 01", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=af8f557e-21a0-4e79-a0ed-afa1011792dc")
-video_downloader.add("LEC 02", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=978e45fb-d132-40b8-b642-afa10117de2c")
+#2) Add Panopto Video URLs  and name of parent folder here
+video_downloader.add()
 
 #3) Start downloads
 video_downloader.start_downloads()
