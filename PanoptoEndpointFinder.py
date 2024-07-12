@@ -5,6 +5,8 @@ from selenium.webdriver.common.keys import Keys
 import json
 import ConfiguredWD as Configured_WD
 from time import sleep
+import os 
+
 #TODO Determine what Seleniun dependencies should be deleted
 class PanoptoEndpointFinder: 
     '''Provides a list of the relevant API Endpoint URLs used by the Panapoto Video Player'''
@@ -22,7 +24,8 @@ class PanoptoEndpointFinder:
             panopto_video_URL = panopto_video_URL.replace("Embed", "Viewer")
         self.__WebDriver.get(panopto_video_URL)
 
-        self.__login_to_kerberos()
+        self.__login_to_panopto()
+        self.__login_to_okta()
         self.__mute_video()
         self.__play_video() 
 
@@ -32,9 +35,11 @@ class PanoptoEndpointFinder:
             self.__click_through_all_cameras()
         sleep(2) 
 
+        logtypes = self.__WebDriver.log_types
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
-        #self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
+        self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
+        
         self.__WebDriver.quit()
 
         if not list_of_endpoint_URLs:
@@ -42,16 +47,50 @@ class PanoptoEndpointFinder:
         else:
             return list_of_endpoint_URLs
 
-    def __login_to_kerberos(self):
+    def __login_to_panopto(self):
+        current_url = self.__WebDriver.current_url #TODO: Replace this one-liner with helper method
+        if "https://mit.hosted.panopto.com/" not in current_url:
+            return
+        
+        sign_in_button = self.__WebDriver.get_element_when_accessible(By.ID, "PageContentPlaceholder_loginControl_externalLoginButton")
+        sign_in_button.click()
+        sleep(2)
+
+        return
+    
+    def __login_to_okta(self):
         sleep(1)
         current_URL = self.__WebDriver.current_url
-        if "https://idp.mit.edu" not in current_URL:
-            return 
+        if not self.__on_login_page(current_URL):
+            sleep(2)
+            return
 
-        login_button = self.__WebDriver.find_element(By.NAME, "Submit")
-        login_button.click()
+        #username_text_field = self.__WebDriver.get_element_when_accessible(By.ID, "input27")
+        #otka_username = os.getenv("OTKA_USERNAME")
+        #username_text_field.send_keys(otka_username)
 
+        next_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div[1]/main/div[2]/div/div/div[2]/form/div[2]/input")
+        next_button.click()
+
+        password_text_field = self.__WebDriver.get_element_when_accessible(By.ID, "input59")
+        okta_password = os.getenv("OKTA_PASSWORD")
+        password_text_field.send_keys(okta_password)
+
+        verify_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div[1]/main/div[2]/div/div/div[2]/form/div[2]/input")
+        verify_button.click()
+        sleep(2.5)
+
+        current_URL = self.__WebDriver.current_url
+        if self.__on_login_page(current_URL):
+            verify_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div[1]/main/div[2]/div/div/div[2]/form/div[2]/input")
+            verify_button.click()
+
+        sleep(5)
         return 
+    
+    def __on_login_page(self, URL):
+        okta_subdomain = "https://okta.mit.edu"
+        return okta_subdomain in URL
 
     def __mute_video(self):
         volume_control_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/form/div[3]/div[10]/div[8]/main/div/div[4]/div/div[1]/div[8]/div[1]")
@@ -110,9 +149,7 @@ class PanoptoEndpointFinder:
                     set_of_endpoint_URLs.add(endpoint_URL)
                     
         list_of_endpoint_URLs = list(set_of_endpoint_URLs)
-        if list_of_endpoint_URLs is False:
-            raise Exception("No endpoints found")
-        
+
         return list_of_endpoint_URLs
 
     def __check_if_num_of_cameras_is_correct(self, list_of_endpoint_URLs):

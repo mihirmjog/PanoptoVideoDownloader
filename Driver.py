@@ -9,6 +9,7 @@ from time import sleep
 import os
 from selenium.webdriver import ActionChains
 
+
 #TODO Determine what Seleniun dependencies should be deleted
 
 class Driver: 
@@ -98,7 +99,7 @@ class Driver:
 
     def __click_on_add_new_link(self, WebDriver):
         current_URL = WebDriver.current_url
-        link_collector_URL = current_URL.replace(":downloads", ":links")
+        link_collector_URL = current_URL.replace(":downloads", ":links")    
         WebDriver.get(link_collector_URL)
         WebDriver.refresh()
         add_links_button = WebDriver.get_element_when_accessible(By.XPATH, "//*[contains(text(),'Add links')]")
@@ -167,10 +168,10 @@ class Driver:
 video_downloader = Driver()
 
 #1) Set download location here:
-video_downloader.set_download_location()
+video_downloader.set_download_location("D:\MIT\TEST")
 
 #2) Add Panopto Video URLs  and name of parent folder here
-video_downloader.add()
+video_downloader.add("LEC 01", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1c3eb548-c730-4460-a5a9-b1040164c680")
 
 #3) Start downloads
 video_downloader.start_downloads()
