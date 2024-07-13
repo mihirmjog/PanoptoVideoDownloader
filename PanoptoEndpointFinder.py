@@ -26,7 +26,14 @@ class PanoptoEndpointFinder:
 
         self.__login_to_panopto()
         self.__login_to_okta()
+
+        panopto_home_page_url = "https://mit.hosted.panopto.com/Panopto/Pages/Home.aspx"    
+        if self.__WebDriver.current_url is panopto_video_URL:
+            self.__WebDriver.get(panopto_home_page_url)
+            sleep(2)
+
         self.__mute_video()
+        self.__set_highest_video_resolution()
         self.__play_video() 
 
         if self.__WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
@@ -35,7 +42,6 @@ class PanoptoEndpointFinder:
             self.__click_through_all_cameras()
         sleep(2) 
 
-        logtypes = self.__WebDriver.log_types
         webdriver_logs = self.__WebDriver.get_log('performance')
         list_of_endpoint_URLs = self.__create_endpoint_URLs_list(webdriver_logs)
         self.__check_if_num_of_cameras_is_correct(list_of_endpoint_URLs) #Raises exception if false
@@ -97,6 +103,8 @@ class PanoptoEndpointFinder:
         
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
+    
+
 
     def __play_video(self): 
         play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")

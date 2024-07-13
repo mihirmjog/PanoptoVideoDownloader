@@ -77,7 +77,7 @@ class Driver:
             self.__type_in_download_URL(WebDriver, download_URL)
             self.__type_in_new_download_location(WebDriver, download_dir)
             self.__wait_until_download_is_added(WebDriver)
-            self.__start_download_for_current_item(WebDriver)
+            self.__start_download_for_current_item(WebDriver)       
             while not self.__has_info_file(download_dir): #JDownloader creates an "info" file after download finishes.
                 sleep(0.5)                                #Once the info file is detected, __has_info_file() removes
                 continue                                  #it before exitng the while loop.

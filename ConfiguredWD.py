@@ -16,9 +16,9 @@ class ConfiguredWD(WD.Chrome):
         chrome_options.add_argument(r"C:\Users\mihir\AppData\Local\Google\Chrome\User Data\Profile 1")
         if logging:
             chrome_options.set_capability("goog:loggingPrefs", {
-                'performance'        : 'ALL'})
+                                                                    'performance'        : 'ALL'})
             chrome_options.add_experimental_option("perfLoggingPrefs", {
-                                                   "traceCategories" : "devtools.Network.requestWillBeSent"})
+                                                                            "traceCategories" : "devtools.Network.requestWillBeSent"})
             
         chrome_service = WD.ChromeService(executable_path = r"C:\Users\mihir\Documents\Git\VideoDownloader\bin\chromedriver.exe")
         super().__init__(options = chrome_options, service = chrome_service) 
