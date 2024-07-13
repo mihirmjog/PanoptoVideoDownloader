@@ -71,10 +71,6 @@ class PanoptoEndpointFinder:
             sleep(2)
             return
 
-        #username_text_field = self.__WebDriver.get_element_when_accessible(By.ID, "input27")
-        #otka_username = os.getenv("OTKA_USERNAME")
-        #username_text_field.send_keys(otka_username)
-
         next_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div[1]/main/div[2]/div/div/div[2]/form/div[2]/input")
         next_button.click()
 
