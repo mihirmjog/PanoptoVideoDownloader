@@ -100,8 +100,6 @@ class PanoptoEndpointFinder:
         if volume_control_button.get_attribute("title") == "Mute":
             volume_control_button.click()
     
-
-
     def __play_video(self): 
         play_button = self.__WebDriver.get_element_when_accessible(By.CSS_SELECTOR, "#playButton")
         
