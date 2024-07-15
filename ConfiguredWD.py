@@ -12,7 +12,7 @@ class ConfiguredWD(WD.Chrome):
     def __init__(self, logging):
         #TODO Start in new browser window
         chrome_options = WD.ChromeOptions()
-        chrome_options.add_argument("user-data-dir=C:/Users/mihir/AppData/Local/Google/Chrome/User Data") 
+        chrome_options.add_argument(r"user-data-dir=C:\Users\mihir\AppData\Local\Google\Chrome\User Data") 
         chrome_options.add_argument(r"C:\Users\mihir\AppData\Local\Google\Chrome\User Data\Profile 1")
         if logging:
             chrome_options.set_capability("goog:loggingPrefs", {

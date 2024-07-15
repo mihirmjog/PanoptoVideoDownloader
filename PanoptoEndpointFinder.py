@@ -54,15 +54,14 @@ class PanoptoEndpointFinder:
             return list_of_endpoint_URLs
 
     def __login_to_panopto(self):
-        current_url = self.__WebDriver.current_url #TODO: Replace this one-liner with helper method
-        if "https://mit.hosted.panopto.com/" not in current_url:
+        try:
+            sign_in_button = self.__WebDriver.get_element_when_accessible(By.ID, "PageContentPlaceholder_loginControl_externalLoginButton")
+        except:
             return
-        
-        sign_in_button = self.__WebDriver.get_element_when_accessible(By.ID, "PageContentPlaceholder_loginControl_externalLoginButton")
-        sign_in_button.click()
-        sleep(2)
-
-        return
+        else:    
+            sign_in_button.click()
+            sleep(2)
+            return
     
     def __login_to_okta(self):
         sleep(1)
@@ -106,6 +105,21 @@ class PanoptoEndpointFinder:
         if play_button.get_attribute("class") == "transport-button paused":
             play_button.click()
             
+    def __set_highest_video_resolution(self):
+        try:
+            gear_button = self.__WebDriver.get_element_when_accessible(By.ID, "reactCaptionsSettingsButton")
+            gear_button.click()
+
+        except NoSuchElementException:
+            return
+        else:
+            quality_button = self.__WebDriver.get_element_when_accessible(By.XPATH, '//li[contains(string(), "Quality")]')
+            quality_button.click()
+
+            high_button = self.__WebDriver.get_element_when_accessible(By.XPATH, '//li[contains(string(), "High")]')
+            high_button.click()
+            gear_button.click() #exits settings menu
+ 
     def __click_through_camera_expander(self):
         camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "secondaryExpander").find_elements(By.TAG_NAME, "div")
