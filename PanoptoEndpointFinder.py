@@ -132,6 +132,11 @@ class PanoptoEndpointFinder:
                 self.__num_of_cameras += 1
                 WD.ActionChains(self.__WebDriver).send_keys(Keys.ESCAPE).perform() #Closes camera expander
 
+    def __is_camera_button(self, potential_camera_button):
+        is_camera = potential_camera_button.get_attribute("class").__contains__("player-tab-header transport-button accented-tab object-video secondary-header")
+        
+        return is_camera
+    
     def __click_through_all_cameras(self):
         list_of_potential_camera_buttons = self.__WebDriver.find_element(By.ID, "transportControls").find_elements(By.TAG_NAME, "div")
         
@@ -176,7 +181,3 @@ class PanoptoEndpointFinder:
         else:
             raise Exception("Incorrect number of cameras for the URL:" + self.__WebDriver.current_url)
 
-    def __is_camera_button(self, potential_camera_button):
-        is_camera = potential_camera_button.get_attribute("class").__contains__("player-tab-header transport-button accented-tab object-video secondary-header")
-        
-        return is_camera
