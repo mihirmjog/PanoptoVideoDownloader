@@ -7,8 +7,6 @@ import subprocess
 import src.ConfiguredWD as Configured_WD
 from time import sleep
 import os
-from selenium.webdriver import ActionChains
-
 
 class Downloader: 
     '''Class that defines entry points to clients'''
