@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
 import json
-import ConfiguredWD as Configured_WD
+import src.ConfiguredWD as Configured_WD
 from time import sleep
 import os 
 
