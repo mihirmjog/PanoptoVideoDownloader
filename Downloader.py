@@ -10,9 +10,7 @@ import os
 from selenium.webdriver import ActionChains
 
 
-#TODO Determine what Seleniun dependencies should be deleted
-
-class Driver: 
+class Downloader: 
     '''Driver Class'''
 
     def __init__(self):
@@ -131,6 +129,7 @@ class Driver:
                 return
             except:
                 WebDriver.refresh()
+                sleep(3)
                 continue
         
         raise Exception("Download is not added")
@@ -163,18 +162,3 @@ class Driver:
         else :
              "Success!"
 
-#------------------------------------------------------------------------------------------------------------------------------------------
-#Driver 
-video_downloader = Driver()
-
-#1) Set download location here:
-video_downloader.set_download_location("D:\MIT\TEST")
-
-#2) Add Panopto Video URLs  and name of parent folder here
-video_downloader.add("LEC 01", "https://mit.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1c3eb548-c730-4460-a5a9-b1040164c680")
-
-#3) Start downloads
-video_downloader.start_downloads()
-
-
-#------------------------------------------------------------------------------------------------------------------------------------------     

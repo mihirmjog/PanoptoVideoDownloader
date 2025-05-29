@@ -33,7 +33,7 @@ class PanoptoEndpointFinder:
             sleep(2)
 
         self.__mute_video()
-        self.__set_highest_video_resolution()
+        #self.__set_highest_video_resolution()
         self.__play_video() 
 
         if self.__WebDriver.find_element(By.ID, "selectedSecondary").is_displayed(): #Checks if the panapto video has a camera expander
@@ -79,7 +79,7 @@ class PanoptoEndpointFinder:
 
         verify_button = self.__WebDriver.get_element_when_accessible(By.XPATH, "/html/body/div[3]/div[1]/main/div[2]/div/div/div[2]/form/div[2]/input")
         verify_button.click()
-        sleep(2.5)
+        sleep(4)
 
         current_URL = self.__WebDriver.current_url
         if self.__on_login_page(current_URL):
@@ -106,19 +106,16 @@ class PanoptoEndpointFinder:
             play_button.click()
             
     def __set_highest_video_resolution(self):
-        try:
             gear_button = self.__WebDriver.get_element_when_accessible(By.ID, "reactCaptionsSettingsButton")
             gear_button.click()
-
-        except NoSuchElementException:
-            return
-        else:
             quality_button = self.__WebDriver.get_element_when_accessible(By.XPATH, '//li[contains(string(), "Quality")]')
             quality_button.click()
-
-            high_button = self.__WebDriver.get_element_when_accessible(By.XPATH, '//li[contains(string(), "High")]')
-            high_button.click()
-            gear_button.click() #exits settings menu
+            try:
+                high_button = self.__WebDriver.get_element_when_accessible(By.XPATH, '//li[contains(string(), "High")]')
+                high_button.click()
+                gear_button.click() #exits settings menu
+            except:
+                return
  
     def __click_through_camera_expander(self):
         camera_expander_button = self.__WebDriver.find_element(By.ID, "selectedSecondary")
